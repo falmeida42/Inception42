@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+
+  wordpress:
+    environment: 
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+    container_name: wordpress
+    build: requirements/wordpress
+    image: wordpress:Dockerfile
+    restart: always
+
+  nginx:
+    container_name: nginx
+    build: requirements/nginx
+    image: nginx:Dockerfile
+    depends_on :
+      - wordpress
+    ports:
+      - "443:443"
+    restart: always
