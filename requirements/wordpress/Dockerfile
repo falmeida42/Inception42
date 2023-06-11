@@ -1,26 +1,48 @@
-FROM  debian:buster
+FROM debian:buster-slim
 
-# install php
-RUN apt-get update -y && apt-get upgrade -y
-RUN apt-get install -y php
-RUN apt-get install -y php-mysql
-RUN apt-get install -y tar
-RUN apt-get install -y php-fpm
-RUN apt-get install -y wget
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    wget \
+    gnupg \
+    ca-certificates \
+    unzip \
+    php7.3 \
+    php7.3-fpm \
+    php7.3-mysql \
+    php7.3-curl \
+    php7.3-gd \
+    php7.3-intl \
+    php7.3-mbstring \
+    php7.3-soap \
+    php7.3-xml \
+    php7.3-xmlrpc \
+    php7.3-zip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# install wordpress
-RUN wget https://wordpress.org/latest.tar.gz
-RUN tar xzvf latest.tar.gz
-RUN rm latest.tar.gz
-RUN mv -f wordpress /var/www/
-RUN chown -R www-data:www-data /var/www/wordpress
+RUN mkdir -p /var/www/html
 
-#config wordpress
-RUN rm -rf /var/www/wordpress/wp-config-sample.php
-COPY ./conf/wp-config.php /var/www/wordpress
-COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+RUN curl -o latest.zip -SL https://wordpress.org/latest.zip && \
+    unzip latest.zip && \
+    rm latest.zip
+
+RUN cp -r wordpress /var/www/html/wordpress/
+
+RUN rm /etc/php/7.3/fpm/pool.d/www.conf
+
 RUN mkdir -p /run/php/
 
-EXPOSE 9000
+RUN touch /run/php/php7.3-fpm.pid
 
-ENTRYPOINT ["php-fpm7.3", "-F"]
+COPY /conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+
+COPY /conf/wp-config.php /var/www/html/wordpress/wp-config.php
+
+WORKDIR /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html
+
+#ENTRYPOINT [ "tail", "-f","/dev/null" ]
+CMD ["php-fpm7.3", "-F", "-R"]
