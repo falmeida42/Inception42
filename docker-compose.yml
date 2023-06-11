@@ -10,20 +10,35 @@ services:
     ports:
       - "443:443"
     restart: always
-    depends_on:
-      - wordpress
+    # depends_on:
+    #   - wordpress
     networks:
       - inception_network
 
-  wordpress:
-    build: ./requirements/wordpress
-    container_name: wordpress
-    image: wordpress
+  # wordpress:
+  #   build: ./requirements/wordpress
+  #   container_name: wordpress
+  #   image: wordpress
+  #   depends_on:
+  #     - mysql
+  #   ports:
+  #     - "9000:9000"
+  #   networks:
+  #     - inception_network
+  
+  mysql:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_root_pass
+      MYSQL_DATABASE: db_name
+      MYSQL_USER: user_name
+      MYSQL_PASSWORD: user_pass
+    restart: always
     ports:
-      - "9000:9000"
-    networks:
-      - inception_network
-# definition fo network
+      - "3306:3306"
+
 networks:
   inception_network:
     driver: bridge

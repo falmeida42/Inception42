@@ -8,9 +8,11 @@ up:
 	sudo docker-compose -f docker-compose.yml up --build -d
 
 fclean:
-	sudo docker-compose -f docker-compose.yml down --rmi all -\
-	-volumes
-		sudo docker rmi debian:buster
-		sudo rm -rf /home/falmeida/data
+	@docker stop $$(docker ps -qa);\
+	docker rm $$(docker ps -qa);\
+	docker rmi -f $$(docker images -qa);\
+	docker volume rm $$(docker volume ls -q);\
+	docker network rm inception-network
+
 
 .PHONY: all up fclean

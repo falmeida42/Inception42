@@ -1,13 +1,19 @@
-FROM debian:buster
+FROM debian:buster-slim
 
-RUN apt update -y && apt upgrade -y
+RUN apt-get update -y && apt-get install -y nginx openssl
 
-RUN apt install -y nginx && apt install openssl -y
+# Copy the default configuration file to /etc/nginx/conf.d/default
+RUN rm /etc/nginx/nginx.conf
+COPY ./conf/default /etc/nginx/nginx.conf
 
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/C=PT/ST=Lisbon/O=42Lisboa/OU=student/CN=falmeida.42.fr"
+COPY ./tools/script.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/script.sh
 
-COPY conf/default etc/nginx/sites-available/default
+RUN mkdir -p /etc/nginx/ssl
+RUN openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
+    -subj "/C=PT/ST=Lisbon/O=42Lisboa/OU=student/CN=falmeida.42.fr" \
+    -keyout /etc/nginx/ssl/nginx.key \
+    -out /etc/nginx/ssl/nginx.crt
 
-EXPOSE 443
-
-CMD [ "nginx", "-g", "daemon off;"]
+ENTRYPOINT [ "/usr/local/bin/script.sh" ]
+CMD ["nginx", "-g", "daemon off;"]
