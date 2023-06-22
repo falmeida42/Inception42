@@ -6,7 +6,7 @@ services:
   nginx:
     build: ./requirements/nginx
     container_name: nginx
-    image: nginx
+    image: nginx:42
     ports:
       - "443:443"
     restart: always
@@ -22,11 +22,9 @@ services:
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
-    image: wordpress
+    image: wordpress:42
     depends_on:
       - mysql
-    ports:
-      - "9000:9000"
     volumes:
       - wordpress_vol:/var/www/html/wordpress
     networks:
@@ -38,7 +36,7 @@ services:
   mysql:
     build: ./requirements/mariadb
     container_name: mariadb
-    image: mariadb
+    image: mariadb:42
     environment:
       MYSQL_ROOT_PASSWORD: mysql_root_pass
       MYSQL_DATABASE: db_name

@@ -2,10 +2,10 @@ all:
 	sudo mkdir -p /home/falmeida/data/wordpress
 	sudo mkdir -p /home/falmeida/data/database
 	sudo chmod 777 /etc/hosts
-	sudo docker-compose -f docker-compose.yml up --build -d
+	sudo docker compose -f docker-compose.yml up --build -d
 
 up:
-	sudo docker-compose -f docker-compose.yml up --build -d
+	sudo docker compose -f docker-compose.yml up --build -d
 
 fclean:
 	@docker stop $$(docker ps -qa);\
