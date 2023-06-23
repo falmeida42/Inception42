@@ -37,7 +37,7 @@ RUN touch /run/php/php7.3-fpm.pid
 
 COPY /conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
 
-#COPY /conf/wp-config.php /var/www/html/wordpress/wp-config.php
+COPY /conf/wp-config.php /var/www/html/wordpress/wp-config.php
 
 WORKDIR /var/www/html
 
