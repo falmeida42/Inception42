@@ -15,4 +15,3 @@ mysql < db.sql
 
 kill $(cat /var/run/mysqld/mysqld.pid)
 
-mysqld

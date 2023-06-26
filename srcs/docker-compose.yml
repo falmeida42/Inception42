@@ -1,8 +1,7 @@
 version: "3.8"
 
-# definition fo services
 services:
-  # nginx
+
   nginx:
     build: ./requirements/nginx
     container_name: nginx
@@ -16,7 +15,7 @@ services:
       - wordpress_vol:/var/www/html/wordpress
     networks:
       - inception_network
-    env_file:
+    environment:
       - .env
 
   wordpress:

@@ -7,7 +7,7 @@ all:
 up:
 	sudo docker compose -f docker-compose.yml up --build -d
 
-fclean:
+clean:
 	@docker stop $$(docker ps -qa);\
 	docker rm $$(docker ps -qa);\
 	docker rmi -f $$(docker images -qa);\

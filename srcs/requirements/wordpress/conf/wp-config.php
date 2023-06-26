@@ -1,8 +1,8 @@
 <?php
 
-define('DB_NAME', 'wordpress');
-define('DB_USER', 'falmeida');
-define('DB_PASSWORD', 'secret');
+define('DB_NAME', 'dbname');
+define('DB_USER', 'user');
+define('DB_PASSWORD', 'pwd');
 define('DB_HOST', 'mariadb');
 define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');
