@@ -31,6 +31,8 @@ services:
     restart: always
     env_file:
       - .env
+    expose:
+      - "9000"
   
   mysql:
     build: ./requirements/mariadb
@@ -48,6 +50,8 @@ services:
       - inception_network
     env_file:
       - .env
+    expose:
+      - "3306"
 
 volumes:
   mysql_vol:

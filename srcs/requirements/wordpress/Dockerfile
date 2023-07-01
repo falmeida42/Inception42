@@ -1,47 +1,36 @@
-FROM debian:buster-slim
+FROM debian:buster
 
-RUN apt-get update && \
-    apt-get install -y \
-    curl \
-    wget \
-    gnupg \
-    ca-certificates \
-    unzip \
-    php7.3 \
-    php7.3-fpm \
-    php7.3-mysql \
-    php7.3-curl \
-    php7.3-gd \
-    php7.3-intl \
-    php7.3-mbstring \
-    php7.3-soap \
-    php7.3-xml \
-    php7.3-xmlrpc \
-    php7.3-zip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+WORKDIR /var/www/html/
 
-RUN mkdir -p /var/www/html
+RUN apt-get update \
+    && apt-get upgrade -yq \
+    && apt-get install -yq wget openssl mariadb-client php php-fpm php-mysqli php-curl php-gd php-xml php-cgi php-http gettext
 
-RUN curl -o latest.zip -SL https://wordpress.org/latest.zip && \
-    unzip latest.zip && \
-    rm latest.zip
+RUN apt-get autoremove \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN cp -r wordpress /var/www/html/wordpress/
+RUN wget https://wordpress.org/latest.tar.gz \
+    && tar -xvf latest.tar.gz \
+    && rm -rf latest.tar.gz
 
-RUN rm /etc/php/7.3/fpm/pool.d/www.conf
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && mv wp-cli.phar /usr/local/bin/wp \
+    && chmod +x /usr/local/bin/wp
 
-RUN mkdir -p /run/php/
+COPY ./tools/script.sh /usr/local/bin/script.sh
 
-RUN touch /run/php/php7.3-fpm.pid
+RUN chmod +x /usr/local/bin/script.sh
 
-COPY /conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+COPY ./conf/wp-config.php /var/www/html/wordpress/wp-config.php
 
-COPY /conf/wp-config.php /var/www/html/wordpress/wp-config.php
+RUN rm /var/www/html/wordpress/wp-config-sample.php
 
-WORKDIR /var/www/html
+RUN mkdir /run/php/ \
+    && touch /run/php/php7.3-fpm.pid
 
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
+RUN chmod -R 755 /var/www/html/wordpress
+
+ENTRYPOINT ["script.sh"]
 
 CMD ["php-fpm7.3", "-F", "-R"]
