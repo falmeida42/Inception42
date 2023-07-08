@@ -1,35 +1,27 @@
-VOLUME_DIRS := ~/data/mariadb ~/data/wordpress
+DCOMPOSE_FILE=./srcs/docker-compose.yml
+ENV_FILE=./srcs/.env
+DOMAIN_USER = falmeida
+WORDPRESS_VOLUME_DIR=/home/${DOMAIN_USER}/data/wordpress_volume
+MARIADB_VOLUME_DIR=/home/${DOMAIN_USER}/data/mariadb_volume
 
-all: up
+all:	persistent_storage
+	@docker compose -f $(DCOMPOSE_FILE) --env-file $(ENV_FILE) up -d
 
-up: $(VOLUME_DIRS)
-	@docker compose -f srcs/docker-compose.yml up -d --build --force-recreate
+clean:
+	@docker compose -f $(DCOMPOSE_FILE) --env-file $(ENV_FILE) down
 
-down:
-	@docker compose -f srcs/docker-compose.yml down
-
-$(VOLUME_DIRS):
-	@sudo mkdir -p ~/data/mariadb
-	@sudo mkdir -p ~/data/wordpress
-
-clean_containers: down
-	@docker container prune
-
-clean_images: down
+fclean: clean
+	@sudo rm -rf $(MARIADB_VOLUME_DIR)
+	@sudo rm -rf $(WORDPRESS_VOLUME_DIR)
+	@sudo rm -rf $(NGINX_LOGS)
 	@docker image prune -a -f
+	@docker system prune -a
 
-clean_volumes: down
-	@docker volume rm mariadb wordpress
-	@sudo rm -rf $(VOLUME_DIRS)
+re: fclean all
 
-clean_networks:
-	@docker network prune
+persistent_storage:
+	@sudo mkdir -pv $(MARIADB_VOLUME_DIR)
+	@sudo mkdir -pv $(WORDPRESS_VOLUME_DIR)
+	@sudo mkdir -pv $(NGINX_LOGS)
 
-clean: down clean_containers
-
-fclean: clean clean_volumes
-	@docker system prune -a --volumes
-
-re: fclean up
-
-.PHONY: all up down clean_containers clean_images clean_volumes clean_networks fclean re
+.PHONY: all fclean clean persistent_storage

@@ -5,7 +5,6 @@ services:
   nginx:
     build: ./requirements/nginx
     container_name: nginx
-    image: nginx:42
     ports:
       - "443:443"
     restart: always
@@ -14,20 +13,19 @@ services:
     volumes:
       - wordpress_vol:/var/www/html/wordpress
     networks:
-      - inception_network
+      - inception
     environment:
       - .env
 
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
-    image: wordpress:42
     depends_on:
       - mysql
     volumes:
       - wordpress_vol:/var/www/html/wordpress
     networks:
-      - inception_network
+      - inception
     restart: always
     env_file:
       - .env
@@ -37,12 +35,11 @@ services:
   mysql:
     build: ./requirements/mariadb
     container_name: mariadb
-    image: mariadb:42
     restart: always
     volumes:
       - mysql_vol:/var/lib/mysql
     networks:
-      - inception_network
+      - inception
     env_file:
       - .env
     expose:
@@ -66,5 +63,6 @@ volumes:
     name: wordpress_vol
 
 networks:
-  inception_network:
+  inception:
+    name: inception
     driver: bridge

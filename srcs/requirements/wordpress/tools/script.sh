@@ -1,37 +1,73 @@
-#!/bin/bash
+#!/bin/sh
 
-set -x 
+set -x
 
-# Create the wordpress config file
-wp config create --allow-root \
-    --dbname=$db_name \
-    --dbuser=$db_user \
-    --dbpass=$db_pwd \
-    --dbhost=$db_host
+if [ -f /usr/local/bin/.docker-entrypoint-finished ]; then
+	rm -f /usr/local/bin/.docker-entrypoint-finished
+	echo "Removed .docker-entrypoint-finished"
+fi
 
-chmod 600 wp-config.php
-
-if wp core is-installed --allow-root; then
-	echo "Wordpress core already installed"
+# Checks if the config file has already been created by a previous run of this script
+if [ -e /etc/php/7.3/fpm/pool.d/www.conf ]; then
+	  echo "FastCGI Process Manager config already created"
 else
 
-# Installs wordpress
-wp core install --allow-root \
-    --url=$DOMAIN_NAME \
-    --title=$WP_TITLE \
-    --admin_user=$WP_ADMIN_USR \
-    --admin_email=$WP_ADMIN_EMAIL \
-    --admin_password=$WP_ADMIN_PWD
+    # Substitutes env variables and creates config file
+    cat /www.conf | envsubst > /etc/php/7.3/fpm/pool.d/www.conf
+	chmod 755 /etc/php/7.3/fpm/pool.d/www.conf
+fi
 
-# create a new user
-wp user create --allow-root \
-    $WP_USR \
-    $WP_EMAIL \
-    --role=author \
-    --user_pass=$WP_PWD
+# Checks if wp-config.php file has already been created by a previous run of this script
+if [ -e wp-config.php ]; then
+	  echo "Wordpress config already created"
+else
 
- # Turns off debugging which is needed when using CLI from container
-wp config set WORDPRESS_DEBUG false --allow-root
+    # Create the wordpress config file
+    wp config create --allow-root \
+        --dbname=$db_name \
+        --dbuser=$db_user \
+        --dbpass=$db_pwd \
+        --dbhost=$db_host
+
+	chmod 600 wp-config.php
+fi
+
+
+# Check if wordpress is already installed
+if wp core is-installed --allow-root; then
+	  echo "Wordpress core already installed"
+else
+
+    # Installs wordpress
+    wp core install --allow-root \
+        --url=$DOMAIN_NAME \
+        --title=$WP_TITLE \
+        --admin_user=$WP_ADMIN_USR \
+        --admin_email=$WP_ADMIN_EMAIL \
+        --admin_password=$WP_ADMIN_PWD
+
+    # create a new author user
+    wp user create --allow-root \
+        $WP_USR \
+        $WP_EMAIL \
+        --role=author \
+        --user_pass=$WP_PWD
+
+    # Turns off debugging which is needed when using CLI from container
+    wp config set WORDPRESS_DEBUG false --allow-root
+fi
+
+# Check if author user has already been created by a previous run of this script
+if !(wp user list --field=user_login --allow-root | grep $WP_USR); then
+
+	# create a new author user
+    wp user create --allow-root \
+        $WP_USR \
+        $WP_EMAIL \
+        --role=author \
+        --user_pass=$WP_PWD
+
+fi
 
 wp plugin update --all --allow-root
 
