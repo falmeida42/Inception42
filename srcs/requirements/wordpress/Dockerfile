@@ -1,10 +1,10 @@
 FROM debian:buster
 
-WORKDIR /var/www/html/
+WORKDIR /var/www/html
 
 RUN apt-get update \
-    && apt-get upgrade -yq \
-    && apt-get install -yq wget openssl mariadb-client php php-fpm php-mysqli php-curl php-gd php-xml php-cgi php-http gettext
+    && apt-get upgrade -y \
+    && apt-get install -y wget openssl mariadb-client php php-fpm php-mysqli php-curl php-gd php-xml php-cgi php-http gettext
 
 RUN apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
@@ -21,7 +21,10 @@ COPY ./tools/script.sh /usr/local/bin/script.sh
 
 RUN chmod +x /usr/local/bin/script.sh
 
-COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+RUN addgroup --system wpg \
+  && adduser --system wpg
+
+COPY ./conf/www.conf /
 COPY ./conf/wp-config.php /var/www/html/wordpress/wp-config.php
 
 RUN rm /var/www/html/wordpress/wp-config-sample.php
@@ -31,6 +34,10 @@ RUN mkdir /run/php/ \
 
 RUN chmod -R 755 /var/www/html/wordpress
 
+RUN rm -rf /etc/php/7.3/fpm/pool.d/www.conf
+
+WORKDIR /var/www/html/wordpress
+
 ENTRYPOINT ["script.sh"]
 
-CMD ["php-fpm7.3", "-F", "-R"]
+CMD ["php-fpm7.3", "-F"]

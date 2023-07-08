@@ -38,11 +38,6 @@ services:
     build: ./requirements/mariadb
     container_name: mariadb
     image: mariadb:42
-    environment:
-      MYSQL_ROOT_PASSWORD: mysql_root_pass
-      MYSQL_DATABASE: db_name
-      MYSQL_USER: user_name
-      MYSQL_PASSWORD: user_pass
     restart: always
     volumes:
       - mysql_vol:/var/lib/mysql
@@ -58,7 +53,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/falmeida/data/database
+      device: /home/${USER}/data/mariadb
       o: bind
     name: mysql_vol
   
@@ -66,7 +61,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/falmeida/data/wordpress
+      device: /home/${USER}/data/wordpress
       o: bind
     name: wordpress_vol
 

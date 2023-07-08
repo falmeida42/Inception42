@@ -12,7 +12,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 fi
 
 # start the service, run the mysql_secure_installation equivalent and set up database and privileged user
-if [ ! -d "/var/lib/mysql/$MYSQL_DATABASE" ]; then
+if [ ! -d "/var/lib/mysql/$db_name" ]; then
 
 service mysql start
 
@@ -22,7 +22,7 @@ service mysql start
 # Configure mysql and create database and user with set permissions
 # Remove test database
 mysql --user=root << _EOF_
-UPDATE mysql.user SET Password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE User='root';
+UPDATE mysql.user SET Password=PASSWORD('$db_root_pwd') WHERE User='root';
 UPDATE mysql.user SET plugin='mysql_native_password' WHERE user='root' AND host='localhost';
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -33,11 +33,11 @@ _EOF_
 
 chown -R mysql:mysql /var/lib/mysql
 
-mysql --user=root --password=$MYSQL_ROOT_PASSWORD << _EOF_
-CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;
-CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';
-GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';
-GRANT USAGE ON *.* TO '$MYSQL_USER'@'%';
+mysql --user=root --password=$db_root_pwd << _EOF_
+CREATE DATABASE IF NOT EXISTS $db_name;
+CREATE USER IF NOT EXISTS '$db_user'@'%' IDENTIFIED BY '$db_pwd';
+GRANT ALL PRIVILEGES ON $db_name.* TO '$db_user'@'%';
+GRANT USAGE ON *.* TO '$db_user'@'%';
 FLUSH PRIVILEGES;
 _EOF_
 

@@ -1,10 +1,19 @@
 FROM debian:buster
 
-RUN apt-get update -y
-RUN apt-get install mariadb-server -y
+RUN apt-get update \
+    && apt-get install -y mariadb-server procps \
+    && apt-get upgrade -y
+RUN rm -rf /var/lib/apt/lists/* \
+    && apt-get autoremove
 
-COPY ./tools/server.cnf /etc/mysql/mariadb.conf.d/
+RUN mkdir -p /var/lib/mysql
 
-COPY ./tools/script.sh /
+COPY ./tools/script.sh /usr/local/bin/script.sh
 
-CMD ["/script.sh"]
+RUN chmod +x /usr/local/bin/script.sh
+
+ENTRYPOINT ["script.sh"]
+
+WORKDIR /usr
+
+CMD ["mysqld_safe", "--datadir=/var/lib/mysql"]

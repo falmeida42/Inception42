@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:buster
 
 RUN apt-get update -y && apt-get install -y nginx openssl
 
@@ -15,5 +15,7 @@ RUN openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
     -keyout /etc/nginx/ssl/nginx.key \
     -out /etc/nginx/ssl/nginx.crt
 
+WORKDIR /etc/nginx
 ENTRYPOINT [ "/usr/local/bin/script.sh" ]
+
 CMD ["nginx", "-g", "daemon off;"]
