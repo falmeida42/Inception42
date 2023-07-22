@@ -2,6 +2,8 @@
 
 set -x
 
+sleep 1
+
 if [ -f /usr/local/bin/.docker-entrypoint-finished ]; then
 	rm -f /usr/local/bin/.docker-entrypoint-finished
 	echo "Removed .docker-entrypoint-finished"
