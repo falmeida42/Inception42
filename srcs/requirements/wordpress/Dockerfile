@@ -1,20 +1,20 @@
-FROM debian:buster
+FROM debian:bullseye
 
 ARG	WORDPRESS_VERSION=5.8.3
 
 RUN apt-get update && apt-get install -y \
 	gettext \
-	php7.3 \
-	php7.3-fpm \
-	php7.3-cli \
+	php7.4 \
+	php7.4-fpm \
+	php7.4-cli \
 	wget \
 	curl \
 	procps \
-	php7.3-curl \
-	php7.3-mysql \
-	php7.3-mbstring \
-	php7.3-xml \
-	php7.3-gd \
+	php7.4-curl \
+	php7.4-mysql \
+	php7.4-mbstring \
+	php7.4-xml \
+	php7.4-gd \
 	sendmail \
 	mariadb-client \
 	gettext-base \
@@ -52,8 +52,8 @@ COPY tools/script.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/script.sh
 
 # - removes default www.conf
-RUN rm -f /etc/php/7.3/fpm/pool.d/www.conf
+RUN rm -f /etc/php/7.4/fpm/pool.d/www.conf
 
 ENTRYPOINT [ "script.sh" ]
 
-CMD [ "/usr/sbin/php-fpm7.3", "-F" ]
+CMD [ "/usr/sbin/php-fpm7.4", "-F" ]

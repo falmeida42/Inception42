@@ -1,20 +1,20 @@
 #!/bin/sh
 
 set -x
-sleep 1
+sleep 10
 if [ -f /usr/local/bin/.docker-entrypoint-finished ]; then
 	rm -f /usr/local/bin/.docker-entrypoint-finished
 	echo "Removed .docker-entrypoint-finished"
 fi
 
 # Checks if the config file has already been created by a previous run of this script
-if [ -e /etc/php/7.3/fpm/pool.d/www.conf ]; then
+if [ -e /etc/php/7.4/fpm/pool.d/www.conf ]; then
 	  echo "FastCGI Process Manager config already created"
 else
 
     # Substitutes env variables and creates config file
-    cat /www.conf.tmpl | envsubst > /etc/php/7.3/fpm/pool.d/www.conf
-	chmod 755 /etc/php/7.3/fpm/pool.d/www.conf
+    cat /www.conf.tmpl | envsubst > /etc/php/7.4/fpm/pool.d/www.conf
+	chmod 755 /etc/php/7.4/fpm/pool.d/www.conf
 fi
 
 # Checks if wp-config.php file has already been created by a previous run of this script
@@ -78,8 +78,8 @@ wp option set close_comments_for_old_posts 0 --allow-root
 wp option set close_comments_days_old 0 --allow-root
 
 # Sets the correct port to listen to nginx
-sed -ie 's/listen = \/run\/php\/php7.3-fpm.sock/listen = 0.0.0.0:9000/g' \
-/etc/php/7.3/fpm/pool.d/www.conf
+sed -ie 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 0.0.0.0:9000/g' \
+/etc/php/7.4/fpm/pool.d/www.conf
 
 chown -R wpg:wpg /var/www/html/*
 
