@@ -13,7 +13,7 @@ if [ -e /etc/php/7.3/fpm/pool.d/www.conf ]; then
 else
 
     # Substitutes env variables and creates config file
-    cat /www.conf | envsubst > /etc/php/7.3/fpm/pool.d/www.conf
+    cat /www.conf.tmpl | envsubst > /etc/php/7.3/fpm/pool.d/www.conf
 	chmod 755 /etc/php/7.3/fpm/pool.d/www.conf
 fi
 
@@ -70,6 +70,12 @@ if !(wp user list --field=user_login --allow-root | grep $WP_USR); then
 fi
 
 wp plugin update --all --allow-root
+
+wp option set comment_moderation 0 --allow-root
+wp option set moderation_notify 0 --allow-root
+wp option set comment_previously_approved 0 --allow-root
+wp option set close_comments_for_old_posts 0 --allow-root   
+wp option set close_comments_days_old 0 --allow-root
 
 # Sets the correct port to listen to nginx
 sed -ie 's/listen = \/run\/php\/php7.3-fpm.sock/listen = 0.0.0.0:9000/g' \

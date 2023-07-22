@@ -37,7 +37,7 @@ RUN addgroup --system wpg \
   && adduser --system wpg
 
 # - copy the config file to container root as a template file
-COPY ./conf/www.conf /www.conf
+COPY ./conf/www.conf /www.conf.tmpl
 
 # - Sets the working directory where I want to download wp core
 WORKDIR /var/www/html/wordpress

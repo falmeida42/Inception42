@@ -1,21 +1,16 @@
 FROM debian:buster
 
-RUN apt-get update -y && apt-get install -y nginx openssl
+RUN apt-get update -y \
+	&& apt-get install -y nginx openssl gettext-base procps \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy the default configuration file to /etc/nginx/conf.d/default
-RUN rm /etc/nginx/nginx.conf
-COPY ./conf/default /etc/nginx/nginx.conf
+COPY ./conf/default /etc/nginx/wordpress.conf.template
 
-COPY ./tools/script.sh /usr/local/bin
+COPY ./tools/script.sh /usr/local/bin/
+
 RUN chmod +x /usr/local/bin/script.sh
 
-RUN mkdir -p /etc/nginx/ssl
-RUN openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
-    -subj "/C=PT/ST=Lisbon/O=42Lisboa/OU=student/CN=falmeida.42.fr" \
-    -keyout /etc/nginx/ssl/nginx.key \
-    -out /etc/nginx/ssl/nginx.crt
-
-WORKDIR /etc/nginx
-ENTRYPOINT [ "/usr/local/bin/script.sh" ]
+ENTRYPOINT [ "script.sh" ]
 
 CMD ["nginx", "-g", "daemon off;"]

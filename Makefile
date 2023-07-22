@@ -4,7 +4,7 @@ WORDPRESS_VOLUME_DIR=/home/falmeida/data/wordpress
 MARIADB_VOLUME_DIR=/home/falmeida/data/mariadb
 
 all:	persistent_storage
-	@docker compose -f $(DCOMPOSE_FILE) --env-file $(ENV_FILE) up -d
+	@docker compose -f $(DCOMPOSE_FILE) --env-file $(ENV_FILE) up --build -d
 
 clean:
 	@docker compose -f $(DCOMPOSE_FILE) --env-file $(ENV_FILE) down
