@@ -21,7 +21,7 @@ services:
     build: ./requirements/wordpress
     container_name: wordpress
     depends_on:
-      - mysql
+      - mariadb
     volumes:
       - wordpress_vol:/var/www/html/wordpress
     networks:
@@ -32,12 +32,12 @@ services:
     expose:
       - "9000"
   
-  mysql:
+  mariadb:
     build: ./requirements/mariadb
     container_name: mariadb
     restart: always
     volumes:
-      - mysql_vol:/var/lib/mysql
+      - mariadb_vol:/var/lib/mariadb
     networks:
       - inception
     env_file:
@@ -46,13 +46,13 @@ services:
       - "3306"
 
 volumes:
-  mysql_vol:
+  mariadb_vol:
     driver: local
     driver_opts:
       type: none
       device: /home/${USER}/data/mariadb
       o: bind
-    name: mysql_vol
+    name: mariadb_vol
   
   wordpress_vol:
     driver: local

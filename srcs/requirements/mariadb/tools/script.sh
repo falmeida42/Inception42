@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# allow external connection
-sed -ie 's/bind-address/#bind-address/g' /etc/mysql/mariadb.conf.d/50-server.cnf
-sed -ie 's/port/#port/g' /etc/mysql/mariadb.conf.d/50-server.cnf
-
 # initialize the MySQL data directory and create the system tables if they don't exist yet
 if [ ! -d "/var/lib/mysql/mysql" ]; then
 
